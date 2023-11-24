@@ -1,0 +1,9 @@
+<div th:fragment="traveller">
+    <div class="breadcrumbs">
+    <span th:each="menuElement, iterStat : ${menuElements}">
+        <a th:if="${!iterStat.last}" class="breadcrumbs__link" th:href="@{${menuElement.url}}" th:text="${menuElement.name}"></a>
+        <span th:if="${!iterStat.last}" class="bullet">•</span>
+        <a th:if="${iterStat.last}" class="breadcrumbs__last" th:text="${menuElement.name}"></a>
+    </span>
+    </div>
+</div>

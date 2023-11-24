@@ -1,0 +1,50 @@
+body {
+    background-color: #f0f8ff;
+}
+
+.card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+body {
+    background-color: #f0f8ff; /* Azure - светло-голубой цвет фона */
+}
+
+nav.navbar {
+    background-color: #1d5a7c; /* Darker Blue - цвет фона навигационной панели */
+}
+
+nav.navbar a.navbar-brand, nav.navbar a.nav-link {
+    color: #ffffff !important; /* White - цвет текста ссылок */
+}
+
+nav.navbar-toggler-icon {
+    background-color: #ffffff;
+}
+
+h2 {
+    color: #1d5a7c; /* Darker Blue - цвет заголовка */
+}
+
+.breadcrumbs {
+    display: flex;
+    align-items: center;
+    padding: 10px; /* Добавим отступы для красивого вида */
+}
+
+.breadcrumbs__link {
+    text-decoration: none;
+    color: #007bff; /* Цвет ссылок, можно настроить по вашему вкусу */
+    margin-right: 8px; /* Расстояние между ссылками */
+}
+
+.bullet {
+    margin: 0 8px; /* Расстояние между точками */
+}
+
+.breadcrumbs__last {
+    font-weight: bold; /* Жирный шрифт для последнего элемента */
+    color: #333; /* Цвет последнего элемента, можно настроить по вашему вкусу */
+}

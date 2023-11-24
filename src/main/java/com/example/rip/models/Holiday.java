@@ -1,6 +1,26 @@
-package com.example.rip.models;import lombok.*;
+package com.example.rip.models;
+
+import lombok.*;
+
 /**
- * Description: 
+ * Description:
+ *
  * @author Vladimir Krasnov
- */public class Holiday {
+ */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class Holiday {
+    private Integer id;
+    private String name;
+    private String description;
+    private String date;
+    private String imageUrl;
+    private Integer tickets;
+    private Integer purchasedTickets;
+
+    // Геттеры и сеттеры
+
+    // Конструктор
 }

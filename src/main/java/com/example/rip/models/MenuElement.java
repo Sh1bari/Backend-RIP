@@ -1,6 +1,17 @@
-package com.example.rip.models;import lombok.*;
+package com.example.rip.models;
+
+import lombok.*;
+
 /**
- * Description: 
+ * Description:
+ *
  * @author Vladimir Krasnov
- */public class MenuElement {
+ */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class MenuElement {
+    private String name;
+    private String url;
 }
