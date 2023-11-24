@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Holidays</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/api/css/styles.css">
+    <!-- Дополнительные стили или скрипты могут быть добавлены здесь -->
+</head>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Мероприятия</h2>
+
+    <div class="row">
+        <div class="col-md-4" th:each="holiday : ${holidays}">
+            <div class="card mb-4" style="border: 1px solid #87ceeb; border-radius: 8px; padding: 15px; margin-bottom: 20px; background-color: #ffffff;">
+                <img th:src="${holiday.imageUrl}" class="card-img-top img-fluid" alt="Holiday Image" style="height: 200px; object-fit: cover;">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${holiday.name}" style="color: #1d5a7c;"></h5>
+                    <p class="card-text" th:text="${holiday.description}" style="color: #333333;"></p>
+                    <p class="card-text" th:text="${holiday.date}" style="color: #555555;"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
