@@ -17,6 +17,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,10 +35,7 @@ public class User {
 
     private String patronymic;
 
-    private String group;
-
-    @Basic
-    private LocalDate birthDate;
+    private String userGroup;
 
     @Enumerated(EnumType.STRING)
     private RecordState recordState;

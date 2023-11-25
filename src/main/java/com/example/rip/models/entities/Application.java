@@ -1,9 +1,11 @@
 package com.example.rip.models.entities;
 
+import com.example.rip.models.enums.ApplicationStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Description:
@@ -37,4 +39,10 @@ public class Application {
     @ManyToOne
     @JoinColumn(name = "moderator_user_id")
     private User moderatorUser;
+
+    @ManyToMany(mappedBy = "applications", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    private List<Event> events;
+
+    @Enumerated(EnumType.STRING)
+    private ApplicationStatus status;
 }

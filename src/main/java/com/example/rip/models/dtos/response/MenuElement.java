@@ -1,4 +1,4 @@
-package com.example.rip.models;
+package com.example.rip.models.dtos.response;
 
 import lombok.*;
 

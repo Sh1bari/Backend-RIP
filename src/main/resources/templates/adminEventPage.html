@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Holidays</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/api/css/styles.css">
+  <script th:src="@{/js/script.js}"></script>
+  <!-- Дополнительные стили или скрипты могут быть добавлены здесь -->
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container mt-3">
+  <h2 class="text-center">Администрирование</h2>
+
+  <!-- Карточка с фильтрацией -->
+  <div class="col-13 card">
+    <div class="card-body">
+      <h5 class="card-title">Поиск</h5>
+
+      <!-- Форма с полем для ввода текста -->
+      <form action="http://localhost:8082/api/events" method="GET">
+        <div class="form-group">
+          <label for="eventNameFilter">Имя мероприятия:</label>
+          <input type="text" class="form-control" id="eventNameFilter" name="name" placeholder="Введите имя" th:value="${defaultName}">
+        </div>
+        <button type="submit" class="btn btn-primary">Применить</button>
+      </form>
+      <!-- Конец формы -->
+
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4" th:each="event : ${events}">
+      <a th:href="@{'http://localhost:8082/api/event/' + ${event.id}}">
+        <div class="card mb-3 pb-0" style="border: 1px solid #87ceeb; border-radius: 8px; padding: 15px; margin-bottom: 20px; background-color: #ffffff; position: relative;">
+
+          <!-- Кнопка удаления -->
+          <form th:onclick="'deleteEvent(' + ${event.id} + ')'" style="position: absolute; top: 10px; right: 10px;">
+            <button class="btn btn-danger" type="submit" title="Удалить" style="width: 30px; height: 30px; padding: 0; background-color: red; border: none;">
+              <!-- Белый крест -->
+              <span style="display: block; width: 100%; height: 100%; text-align: center; line-height: 30px; font-size: 20px; color: white;">✖️</span>
+            </button>
+          </form>
+
+          <!-- Фотография и остальной код карточки -->
+          <img th:src="@{/file/{id}(id=${event.imageFileId})}" class="card-img-top img-fluid" alt="Holiday Image" style="height: 200px; object-fit: cover;">
+          <div class="card-body">
+            <h5 class="card-title" th:text="${event.name}" style="color: #1d5a7c;"></h5>
+            <p class="card-text" th:text="${event.date}" style="color: #555555; margin-top: 2px;"></p>
+            <p class="card-text" th:text="${#strings.length(event.description) > 80 ? #strings.substring(event.description, 0, 80) + '...' : event.description}" style="color: #333333; height: 70px; overflow: hidden;"></p>
+            <p class="card-left" style="margin-top: 30px;">
+              <span style="font-weight: bold; color: #006400;">Осталось мест: <span th:text="${event.tickets - event.purchasedTickets}"></span></span>
+            </p>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>
