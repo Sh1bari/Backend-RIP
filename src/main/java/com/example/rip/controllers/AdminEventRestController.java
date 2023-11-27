@@ -7,6 +7,7 @@ import lombok.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,17 +19,18 @@ import java.util.List;
  *
  * @author Vladimir Krasnov
  */
-@RestController
+@Controller
 @RequiredArgsConstructor
 @RequestMapping("/admin")
 public class AdminEventRestController {
     private final EventService eventService;
 
-    @DeleteMapping("/event/{id}")
-    public ResponseEntity<?> deleteEvent(@PathVariable(name = "id") Integer id) {
+    @PostMapping("/event/{id}/delete")
+    public String deleteEvent(@PathVariable(name = "id") Integer id) {
         EventRes res = eventService.deleteEventById(id);
-        return ResponseEntity
+        /*return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
-                .build();
+                .build();*/
+        return "redirect:/admin/events";
     }
 }

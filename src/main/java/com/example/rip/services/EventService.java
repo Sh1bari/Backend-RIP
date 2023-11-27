@@ -36,10 +36,13 @@ public class EventService {
         return EventRes.mapFromEntity(event);
     }
     public EventRes deleteEventById(Integer id){
-        Event event = eventRepo.findById(id)
+        /*Event event = eventRepo.findById(id)
                 .orElseThrow(()-> new EventNotFoundException(id));
         event.setState(EventState.DELETED);
-        eventRepo.save(event);
+        eventRepo.save(event);*/
+        eventRepo.updateStateToDeleted(id);
+        Event event = eventRepo.findById(id)
+                .orElseThrow(()-> new EventNotFoundException(id));
         return EventRes.mapFromEntity(event);
     }
 

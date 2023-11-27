@@ -13,6 +13,9 @@
 <div th:replace="~{fragments/header :: header}"></div>
 
 <div class="container mt-3">
+  <div class="traveller-container">
+    <div th:replace="~{fragments/traveller :: traveller}"></div>
+  </div>
   <h2 class="text-center">Архив мероприятий</h2>
 
   <!-- Карточка с фильтрацией -->
@@ -21,7 +24,7 @@
       <h5 class="card-title">Поиск</h5>
 
       <!-- Форма с полем для ввода текста -->
-      <form action="http://localhost:8082/api/events" method="GET">
+      <form action="http://localhost:8082/api/events/archive" method="GET">
         <div class="form-group">
           <label for="eventNameFilter">Имя мероприятия:</label>
           <input type="text" class="form-control" id="eventNameFilter" name="name" placeholder="Введите имя" th:value="${defaultName}">

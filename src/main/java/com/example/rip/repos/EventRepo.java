@@ -5,7 +5,10 @@ import com.example.rip.models.enums.EventState;
 import lombok.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Description:
@@ -13,5 +16,10 @@ import org.springframework.data.repository.CrudRepository;
  * @author Vladimir Krasnov
  */
 public interface EventRepo extends CrudRepository<Event, Integer> {
+
+    @Transactional
+    @Modifying
+    @Query(value = "UPDATE Event SET state = 'DELETED' WHERE id = ?1", nativeQuery = true)
+    void updateStateToDeleted(Integer id);
     Page<Event> findAllByNameContainsIgnoreCaseAndState(String name, EventState status, Pageable pageable);
 }
