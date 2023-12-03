@@ -2,6 +2,7 @@ package com.example.rip.models.dtos.response;
 
 import com.example.rip.models.entities.Event;
 import com.example.rip.models.enums.ApplicationStatus;
+import com.example.rip.models.enums.EventState;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ public class EventRes {
     private String name;
     private String description;
     private String date;
+    private EventState state;
     private Integer imageFileId;
     private Integer tickets;
     private Integer purchasedTickets;
@@ -35,6 +37,7 @@ public class EventRes {
         EventRes builder = EventRes.builder()
                 .id(event.getId())
                 .name(event.getName())
+                .state(event.getState())
                 .description(event.getDescription())
                 .date(formattedDateTime) // Преобразование LocalDateTime в строку
                 .imageFileId(event.getFile() != null ? event.getFile().getId() : null)

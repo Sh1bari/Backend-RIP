@@ -32,21 +32,18 @@ public class Event {
     private LocalDateTime eventTime;
 
     @Basic
-    private LocalDateTime createTime;
-
-    @Basic
-    private LocalDateTime deleteTime;
+    private LocalDateTime createTime = LocalDateTime.now();
 
     @Basic
     private LocalDateTime archiveTime;
 
-    @OneToOne(mappedBy = "event", orphanRemoval = true)
-    private File file;
+    @OneToOne(mappedBy = "event", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, orphanRemoval = true)
+    private File file = new File();
 
     private Integer tickets;
 
     @Enumerated(EnumType.STRING)
-    private EventState state;
+    private EventState state = EventState.ACTIVE;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(name = "Event_applications",

@@ -24,6 +24,12 @@ public class File {
     @JoinColumn(name = "event_id")
     private Event event;
 
+    private String name;
+
+    private String type;
+
+    private Long size;
+
     private String path;
 
 }

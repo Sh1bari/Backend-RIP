@@ -1,98 +1,94 @@
 package com.example.rip.controllers;
 
+import com.example.rip.models.dtos.request.EventCreateReq;
+import com.example.rip.models.dtos.response.EventAllRes;
 import com.example.rip.models.dtos.response.EventRes;
-import com.example.rip.models.dtos.response.Holiday;
-import com.example.rip.models.dtos.response.MenuElement;
+import com.example.rip.models.entities.Application;
+import com.example.rip.models.entities.Event;
+import com.example.rip.models.enums.ApplicationStatus;
 import com.example.rip.models.enums.EventState;
+import com.example.rip.repos.ApplicationRepo;
 import com.example.rip.services.EventService;
-import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import lombok.*;
 import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.net.URI;
 
-@Controller
+/**
+ * Description:
+ *
+ * @author Vladimir Krasnov
+ */
+@RestController
 @RequiredArgsConstructor
+@Validated
 public class EventController {
 
     private final EventService eventService;
+    private final ApplicationRepo applicationRepo;
+    private final int id = 1;
 
     @GetMapping("/events")
-    public String getEvents(Model model,
-                            @RequestParam(name = "name", required = false, defaultValue = "") String name,
-                            @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
-                            @RequestParam(name = "status", required = false, defaultValue = "ACTIVE")EventState status) {
-        Page<EventRes> res = eventService.getEventsByPageFiltered(name, status, page);
-        model.addAttribute("events", res.getContent());
-
-        List<MenuElement> menuElements = Arrays.asList(
-                new MenuElement("Мероприятия", "http://localhost:8082/api/events")
-        );
-        model.addAttribute("menuElements", menuElements);
-        model.addAttribute("defaultName", name);
-
-        return "mainPage";
-    }
-
-    @GetMapping("/events/archive")
-    public String getArchivedEvents(Model model,
-                            @RequestParam(name = "name", required = false, defaultValue = "") String name,
-                            @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
-                            @RequestParam(name = "status", required = false, defaultValue = "ARCHIVED")EventState status) {
-        Page<EventRes> res = eventService.getEventsByPageFiltered(name, status, page);
-        model.addAttribute("events", res.getContent());
-
-        List<MenuElement> menuElements = Arrays.asList(
-                new MenuElement("Мероприятия", "http://localhost:8082/api/events"),
-                new MenuElement("Архив", "http://localhost:8082/api/events/archive")
-        );
-        model.addAttribute("menuElements", menuElements);
-        model.addAttribute("defaultName", name);
-
-        return "archiveMainPage";
+    public ResponseEntity<EventAllRes> getEvents(
+            @RequestParam(name = "status", required = false, defaultValue = "ACTIVE") EventState status,
+            @RequestParam(name = "name", required = false, defaultValue = "") String name,
+            @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
+            @RequestParam(name = "limit", required = false, defaultValue = "30") Integer limit){
+        Page<EventRes> resPage = eventService.getEventsByPageFiltered(name, status, page, limit);
+        Application application = applicationRepo.findByCreatorUser_IdAndStatus(1, ApplicationStatus.DRAFT)
+                .orElse(new Application());
+        EventAllRes res = new EventAllRes();
+        res.setEvents(resPage);
+        res.setApplicationId(application.getId());
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(res);
     }
 
     @GetMapping("/event/{id}")
-    public String getEvent(Model model, @PathVariable(name = "id") Integer id) {
+    public ResponseEntity<EventRes> getEventById(
+            @PathVariable(value = "id") @Min(value = 1, message = "Id не может быть меньше 1") Integer id){
         EventRes res = eventService.getEventById(id);
-        List<MenuElement> menuElements = Arrays.asList(
-                new MenuElement("Мероприятия", "http://localhost:8082/api/events"),
-                new MenuElement(res.getName(), "http://localhost:8082/api/event/" + id)
-        );
-
-        model.addAttribute("menuElements", menuElements);
-
-        model.addAttribute("selectedEvent", res);
-        return "event";
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(res);
     }
 
-    @GetMapping("/about")
-    public String getAbout(Model model) {
-        List<MenuElement> menuElements = Arrays.asList(
-                new MenuElement("Мероприятия", "http://localhost:8082/api/events"),
-                new MenuElement("О нас", "")
-        );
+    @PostMapping("/events")
+    public ResponseEntity<EventRes> addEvent(
+            @RequestBody @Valid EventCreateReq req){
 
-        model.addAttribute("menuElements", menuElements);
-        return "about";
+        Event res = eventService.addEvent(req);
+        return ResponseEntity
+                .created(URI.create("/api/event/" + res.getId()))
+                .body(EventRes.mapFromEntity(res));
     }
 
-    private List<Holiday> createSampleHolidays() {
-        List<Holiday> holidays = new ArrayList<>();
-
-        holidays.add(new Holiday(1,"Christmas", "Celebration of joy and happiness", "25th December", "https://cdn.7days.ru/pic/08e/984797/1462728/86.jpg", 30, 10));
-        holidays.add(new Holiday(2,"New Year", "Welcoming the upcoming year", "1st January", "https://sakhalife.ru/wp-content/uploads/2023/01/novyj-god.png", 40, 2));
-        holidays.add(new Holiday(3,"Christmas", "Celebration of joy and happiness", "25th December", "https://cdn.7days.ru/pic/08e/984797/1462728/86.jpg", 30, 12));
-        holidays.add(new Holiday(4,"New Year", "Welcoming the uйц уйцуйц йцуйцуйУУУУ УУУУУУУУУУ УУ УУУУУУУцйуса3уаЦ АУС цук ываыpcoming year", "1st January", "https://cdn.7days.ru/pic/08e/984797/1462728/86.jpg", 90, 33));
-        holidays.add(new Holiday(5,"New Year", "Welcoming the upcoming year", "1st January", "https://cdn.7days.ru/pic/08e/984797/1462728/86.jpg", 112, 1));
-
-        return holidays;
+    @DeleteMapping("/event/{id}/delete")
+    public ResponseEntity<?> deleteEvent(@PathVariable(name = "id") Integer id) {
+        EventRes res = eventService.deleteEventById(id);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
     }
+
+    @PutMapping("/event/{id}")
+    public ResponseEntity<EventRes> updateEvent(
+            @PathVariable(value = "id") @Min(value = 1, message = "Id не может быть меньше 1") Integer id,
+            @RequestBody @Valid EventCreateReq req){
+
+        Event res = eventService.updateEvent(id, req);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(EventRes.mapFromEntity(res));
+    }
+
+
+
 }
