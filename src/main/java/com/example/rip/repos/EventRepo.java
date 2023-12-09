@@ -10,6 +10,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 /**
  * Description:
  *
@@ -21,5 +24,7 @@ public interface EventRepo extends CrudRepository<Event, Integer> {
     @Modifying
     @Query(value = "UPDATE Event SET state = 'DELETED' WHERE id = ?1", nativeQuery = true)
     void updateStateToDeleted(Integer id);
+
+    List<Event> findAllByStateAndEventTimeBefore(EventState state, LocalDateTime eventTime);
     Page<Event> findAllByNameContainsIgnoreCaseAndState(String name, EventState status, Pageable pageable);
 }

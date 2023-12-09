@@ -24,19 +24,6 @@ import java.util.Date;
 public class MinioService {
     private final MinioClient minioClient;
 
-    public InputStream getFile(String objectName) {
-        try {
-            return minioClient.getObject(
-                    GetObjectArgs.builder()
-                            .bucket("rip")
-                            .object(objectName)
-                            .build()
-            );
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 
     public String putFile(String bucket, String path, MultipartFile file){
         deleteFile(bucket, path);

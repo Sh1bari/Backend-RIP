@@ -1,6 +1,7 @@
 package com.example.rip.controllers;
 
 import com.example.rip.models.dtos.request.EventCreateReq;
+import com.example.rip.models.dtos.response.ApplicationRes;
 import com.example.rip.models.dtos.response.EventAllRes;
 import com.example.rip.models.dtos.response.EventRes;
 import com.example.rip.models.entities.Application;
@@ -8,6 +9,7 @@ import com.example.rip.models.entities.Event;
 import com.example.rip.models.enums.ApplicationStatus;
 import com.example.rip.models.enums.EventState;
 import com.example.rip.repos.ApplicationRepo;
+import com.example.rip.services.ApplicationService;
 import com.example.rip.services.EventService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -32,6 +34,7 @@ public class EventController {
 
     private final EventService eventService;
     private final ApplicationRepo applicationRepo;
+    private final ApplicationService applicationService;
     private final int id = 1;
 
     @GetMapping("/events")
@@ -41,7 +44,7 @@ public class EventController {
             @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
             @RequestParam(name = "limit", required = false, defaultValue = "30") Integer limit){
         Page<EventRes> resPage = eventService.getEventsByPageFiltered(name, status, page, limit);
-        Application application = applicationRepo.findByCreatorUser_IdAndStatus(1, ApplicationStatus.DRAFT)
+        Application application = applicationRepo.findByCreatorUser_IdAndStatus(id, ApplicationStatus.DRAFT)
                 .orElse(new Application());
         EventAllRes res = new EventAllRes();
         res.setEvents(resPage);
@@ -70,7 +73,7 @@ public class EventController {
                 .body(EventRes.mapFromEntity(res));
     }
 
-    @DeleteMapping("/event/{id}/delete")
+    @DeleteMapping("/event/{id}")
     public ResponseEntity<?> deleteEvent(@PathVariable(name = "id") Integer id) {
         EventRes res = eventService.deleteEventById(id);
         return ResponseEntity
@@ -89,6 +92,24 @@ public class EventController {
                 .body(EventRes.mapFromEntity(res));
     }
 
+    @PostMapping("/application/{id}/event/{eId}")
+    public ResponseEntity<ApplicationRes> addEventToApplication(
+            @PathVariable(value = "id") @Min(value = 1, message = "Id не может быть меньше 1") Integer id,
+            @PathVariable(value = "eId") @Min(value = 1, message = "Id не может быть меньше 1") Integer eId){
+        ApplicationRes res = applicationService.addEvent(id, eId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(res);
+    }
 
+    @DeleteMapping("/application/{id}/event/{eId}")
+    public ResponseEntity<ApplicationRes> deleteEventFromApplication(
+            @PathVariable(value = "id") @Min(value = 1, message = "Id не может быть меньше 1") Integer id,
+            @PathVariable(value = "eId") @Min(value = 1, message = "Id не может быть меньше 1") Integer eId){
+        ApplicationRes res = applicationService.deleteEvent(id, eId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(res);
+    }
 
 }

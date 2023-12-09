@@ -6,7 +6,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Description:
@@ -49,6 +51,6 @@ public class Event {
     @JoinTable(name = "Event_applications",
             joinColumns = @JoinColumn(name = "event_id"),
             inverseJoinColumns = @JoinColumn(name = "applications_id"))
-    private List<Application> applications = new ArrayList<>();
+    private Set<Application> applications = new LinkedHashSet<>();
 
 }

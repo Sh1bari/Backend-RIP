@@ -25,6 +25,7 @@ public class EventRes {
     private String date;
     private EventState state;
     private Integer imageFileId;
+    private String imageFilePath;
     private Integer tickets;
     private Integer purchasedTickets;
 
@@ -41,6 +42,7 @@ public class EventRes {
                 .description(event.getDescription())
                 .date(formattedDateTime) // Преобразование LocalDateTime в строку
                 .imageFileId(event.getFile() != null ? event.getFile().getId() : null)
+                .imageFilePath(event.getFile().getPath())
                 .tickets(event.getTickets())
                 .purchasedTickets((int) event.getApplications().stream()
                         .filter(o->o.getStatus().equals(ApplicationStatus.COMPLETED))

@@ -6,6 +6,7 @@ import com.example.rip.models.dtos.response.EventRes;
 import com.example.rip.models.entities.Event;
 import com.example.rip.models.enums.EventState;
 import com.example.rip.repos.EventRepo;
+import com.example.rip.repos.FileRepo;
 import lombok.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +22,8 @@ import org.springframework.stereotype.Service;
 public class EventService {
 
     private final EventRepo eventRepo;
+    private final MinioService minioService;
+    private final FileRepo fileRepo;
 
     public EventRes getEventById(Integer id){
         Event event = eventRepo.findById(id)
@@ -32,6 +35,9 @@ public class EventService {
         eventRepo.updateStateToDeleted(id);
         Event event = eventRepo.findById(id)
                 .orElseThrow(()-> new EventNotFoundException(id));
+        minioService.deleteFile("rip", event.getFile().getPath());
+        event.getFile().setPath("notFound.png");
+        eventRepo.save(event);
         return EventRes.mapFromEntity(event);
     }
 

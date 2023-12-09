@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @OpenAPIDefinition(
         info = @Info(
-                description = "Green Atom ERP System"
+                description = "RIP Labs"
         )
 )
 @SecurityScheme(

@@ -27,9 +27,9 @@ public class FileService {
         file.setType(multipartFile.getContentType());
         file.setSize(multipartFile.getSize());
         if(file.getPath() != null){
-            file.setPath(minioService. putFile("files", file.getPath(), multipartFile));
+            file.setPath(minioService. putFile("rip", file.getPath(), multipartFile));
         }else {
-            file.setPath(minioService.saveFile("files", multipartFile));
+            file.setPath(minioService.saveFile("rip", multipartFile));
         }
         fileRepo.save(file);
 
