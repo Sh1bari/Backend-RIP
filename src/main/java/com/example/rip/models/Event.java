@@ -11,7 +11,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Holiday {
+public class Event {
     private Integer id;
     private String name;
     private String description;
