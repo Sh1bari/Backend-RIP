@@ -26,7 +26,7 @@ public class EventController {
 
     @GetMapping("/events")
     public String getEvents(Model model,
-                            @RequestParam(name = "name", required = false, defaultValue = "") String name,
+                            @RequestParam(name = "eventName", required = false, defaultValue = "") String name,
                             @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
                             @RequestParam(name = "status", required = false, defaultValue = "ACTIVE")EventState status) {
         Page<EventRes> res = eventService.getEventsByPageFiltered(name, status, page);
@@ -43,7 +43,7 @@ public class EventController {
 
     @GetMapping("/events/archive")
     public String getArchivedEvents(Model model,
-                            @RequestParam(name = "name", required = false, defaultValue = "") String name,
+                            @RequestParam(name = "eventName", required = false, defaultValue = "") String name,
                             @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
                             @RequestParam(name = "status", required = false, defaultValue = "ARCHIVED")EventState status) {
         Page<EventRes> res = eventService.getEventsByPageFiltered(name, status, page);

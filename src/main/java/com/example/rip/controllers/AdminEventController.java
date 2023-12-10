@@ -25,7 +25,7 @@ public class AdminEventController {
     private final EventService eventService;
     @GetMapping("/admin/events")
     public String getEvents(Model model,
-                            @RequestParam(name = "name", required = false, defaultValue = "") String name,
+                            @RequestParam(name = "eventName", required = false, defaultValue = "") String name,
                             @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
                             @RequestParam(name = "status", required = false, defaultValue = "ACTIVE") EventState status) {
         Page<EventRes> res = eventService.getEventsByPageFiltered(name, status, page);

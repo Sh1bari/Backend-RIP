@@ -24,7 +24,7 @@
             <form action="http://localhost:8082/api/events" method="GET">
                 <div class="form-group">
                     <label for="eventNameFilter">Имя мероприятия:</label>
-                    <input type="text" class="form-control" id="eventNameFilter" name="name" placeholder="Введите имя" th:value="${defaultName}">
+                    <input type="text" class="form-control" id="eventNameFilter" name="eventName" placeholder="Введите имя" th:value="${defaultName}">
                 </div>
                 <button type="submit" class="btn btn-primary">Применить</button>
             </form>
