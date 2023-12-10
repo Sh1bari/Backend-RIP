@@ -21,6 +21,7 @@ import java.util.List;
  * @author Vladimir Krasnov
  */
 @RestController
+@CrossOrigin
 @RequiredArgsConstructor
 @Validated
 public class ApplicationController {

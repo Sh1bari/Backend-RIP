@@ -3,7 +3,9 @@ package com.example.rip.services;
 import com.example.rip.exceptions.event.EventNotFoundException;
 import com.example.rip.models.dtos.request.EventCreateReq;
 import com.example.rip.models.dtos.response.EventRes;
+import com.example.rip.models.dtos.response.FileRes;
 import com.example.rip.models.entities.Event;
+import com.example.rip.models.entities.File;
 import com.example.rip.models.enums.EventState;
 import com.example.rip.repos.EventRepo;
 import com.example.rip.repos.FileRepo;
@@ -11,6 +13,7 @@ import lombok.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Description:
@@ -24,6 +27,12 @@ public class EventService {
     private final EventRepo eventRepo;
     private final MinioService minioService;
     private final FileRepo fileRepo;
+    private final FileService fileService;
+    public FileRes savePhotoByEvent(Integer id, MultipartFile file){
+        Event event = eventRepo.findById(id)
+                .orElseThrow(()-> new EventNotFoundException(id));
+        return FileRes.mapFromEntity(fileService.saveFile(event.getFile().getId(), file));
+    }
 
     public EventRes getEventById(Integer id){
         Event event = eventRepo.findById(id)

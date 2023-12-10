@@ -4,8 +4,10 @@ import com.example.rip.models.dtos.request.EventCreateReq;
 import com.example.rip.models.dtos.response.ApplicationRes;
 import com.example.rip.models.dtos.response.EventAllRes;
 import com.example.rip.models.dtos.response.EventRes;
+import com.example.rip.models.dtos.response.FileRes;
 import com.example.rip.models.entities.Application;
 import com.example.rip.models.entities.Event;
+import com.example.rip.models.entities.File;
 import com.example.rip.models.enums.ApplicationStatus;
 import com.example.rip.models.enums.EventState;
 import com.example.rip.repos.ApplicationRepo;
@@ -19,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
 
@@ -28,6 +31,7 @@ import java.net.URI;
  * @author Vladimir Krasnov
  */
 @RestController
+@CrossOrigin
 @RequiredArgsConstructor
 @Validated
 public class EventController {
@@ -39,8 +43,8 @@ public class EventController {
 
     @GetMapping("/events")
     public ResponseEntity<EventAllRes> getEvents(
-            @RequestParam(name = "status", required = false, defaultValue = "ACTIVE") EventState status,
-            @RequestParam(name = "name", required = false, defaultValue = "") String name,
+            @RequestParam(name = "eventStatus", required = false, defaultValue = "ACTIVE") EventState status,
+            @RequestParam(name = "eventName", required = false, defaultValue = "") String name,
             @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
             @RequestParam(name = "limit", required = false, defaultValue = "30") Integer limit){
         Page<EventRes> resPage = eventService.getEventsByPageFiltered(name, status, page, limit);
@@ -58,6 +62,17 @@ public class EventController {
     public ResponseEntity<EventRes> getEventById(
             @PathVariable(value = "id") @Min(value = 1, message = "Id не может быть меньше 1") Integer id){
         EventRes res = eventService.getEventById(id);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(res);
+    }
+
+    @PostMapping("event/{id}/photo")
+    public ResponseEntity<FileRes> updatePhoto(
+            @PathVariable(value = "id") @Min(value = 1, message = "Id не может быть меньше 1") Integer id,
+            @RequestParam(value = "file", required = true) MultipartFile file){
+        FileRes res = eventService.savePhotoByEvent(id, file);
+
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(res);
