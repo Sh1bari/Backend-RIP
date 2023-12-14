@@ -6,6 +6,7 @@ import com.example.rip.exceptions.event.EventNotFoundException;
 import com.example.rip.exceptions.event.EventNotInApplicationException;
 import com.example.rip.exceptions.user.UserNotFoundException;
 import com.example.rip.models.dtos.request.ApplicationVote;
+import com.example.rip.models.dtos.response.ApplicationAllRes;
 import com.example.rip.models.dtos.response.ApplicationRes;
 import com.example.rip.models.entities.Application;
 import com.example.rip.models.entities.Event;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,15 +38,15 @@ public class ApplicationService {
 
     public ApplicationRes getApplicationById(Integer id){
         Application application = applicationRepo.findById(id)
-                .orElseThrow(()->new ApplicationNotFound(id));
+                .orElseThrow(()->new ApplicationNotFoundException(id));
         ApplicationRes res = ApplicationRes.mapFromEntity(application);
         return res;
     }
 
-    public List<ApplicationRes> getAllApplications(ApplicationStatus status, LocalDateTime dateFrom){
+    public List<ApplicationAllRes> getAllApplications(ApplicationStatus status, LocalDateTime dateFrom){
         List<Application> applications = applicationRepo.findAllByStatusAndFormationTimeAfter(status, dateFrom);
-        List<ApplicationRes> res = applications.stream()
-                .map(ApplicationRes::mapFromEntity)
+        List<ApplicationAllRes> res = applications.stream()
+                .map(ApplicationAllRes::mapFromEntity)
                 .toList();
         return res;
     }
@@ -52,7 +54,7 @@ public class ApplicationService {
     @Transactional
     public ApplicationRes formApplication(Integer id){
         Application application = applicationRepo.findById(id)
-                .orElseThrow(()->new ApplicationNotFound(id));
+                .orElseThrow(()->new ApplicationNotFoundException(id));
         if(!application.getStatus().equals(ApplicationStatus.DRAFT)){
             throw new ApplicationNotInDraftException();
         }
@@ -62,16 +64,11 @@ public class ApplicationService {
         application.setFormationTime(LocalDateTime.now());
         application.setStatus(ApplicationStatus.FORMED);
         applicationRepo.save(application);
-        Application newApplication = new Application();
-        newApplication.setStatus(ApplicationStatus.DRAFT);
-        newApplication.setCreatorUser(application.getCreatorUser());
-        newApplication.setCreateTime(LocalDateTime.now());
-        applicationRepo.save(newApplication);
         return ApplicationRes.mapFromEntity(application);
     }
     public ApplicationRes voteApplication(Integer id, ApplicationVote vote, String username) {
         Application application = applicationRepo.findById(id)
-                .orElseThrow(()->new ApplicationNotFound(id));
+                .orElseThrow(()->new ApplicationNotFoundException(id));
         User user = userRepo.findByUsername(username)
                         .orElseThrow(()->new UserNotFoundException(username));
         if(!application.getStatus().equals(ApplicationStatus.FORMED)){
@@ -89,8 +86,8 @@ public class ApplicationService {
 
     public Application deleteApplication(Integer id){
         Application application = applicationRepo.findById(id)
-                .orElseThrow(()->new ApplicationNotFound(id));
-        if(!application.getStatus().equals(ApplicationStatus.FORMED)){
+                .orElseThrow(()->new ApplicationNotFoundException(id));
+        if(!application.getStatus().equals(ApplicationStatus.FORMED) && !application.getStatus().equals(ApplicationStatus.DRAFT)){
             throw new ApplicationNotFormedException();
         }
         application.setEndTime(LocalDateTime.now());
@@ -98,11 +95,26 @@ public class ApplicationService {
         return applicationRepo.save(application);
     }
 
-    public ApplicationRes addEvent(Integer id, Integer eId){
-        Application application = applicationRepo.findById(id)
-                .orElseThrow(()->new ApplicationNotFound(id));
+    public ApplicationRes addEvent(Integer id, Integer eId, String username){
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(()-> new UserNotFoundException(username));
+        Application application;
         Event event = eventRepo.findById(eId)
                 .orElseThrow(()->new EventNotFoundException(id));
+        if(id != 0) {
+            application = applicationRepo.findById(id)
+                    .orElseThrow(() -> new ApplicationNotFoundException(id));
+        }else{
+            if(applicationRepo.findByCreatorUser_UsernameAndStatus(username, ApplicationStatus.DRAFT).isPresent()){
+                throw new ApplicationDraftPresentsException();
+            }
+            Application newApplication = new Application();
+            newApplication.setStatus(ApplicationStatus.DRAFT);
+            newApplication.setCreatorUser(user);
+            newApplication.setCreateTime(LocalDateTime.now());
+            newApplication.setEvents(new ArrayList<>());
+            application = applicationRepo.save(newApplication);
+        }
         if(!application.getStatus().equals(ApplicationStatus.DRAFT)){
             throw new ApplicationNotInDraftException();
         }
@@ -116,7 +128,7 @@ public class ApplicationService {
     }
     public ApplicationRes deleteEvent(Integer id, Integer eId){
         Application application = applicationRepo.findById(id)
-                .orElseThrow(()->new ApplicationNotFound(id));
+                .orElseThrow(()->new ApplicationNotFoundException(id));
         Event event = eventRepo.findById(eId)
                 .orElseThrow(()->new EventNotFoundException(eId));
         if(!application.getStatus().equals(ApplicationStatus.DRAFT)){

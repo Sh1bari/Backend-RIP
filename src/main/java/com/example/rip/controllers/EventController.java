@@ -39,7 +39,7 @@ public class EventController {
     private final EventService eventService;
     private final ApplicationRepo applicationRepo;
     private final ApplicationService applicationService;
-    private final int id = 1;
+    private final String username = "Sh1bari";
 
     @GetMapping("/events")
     public ResponseEntity<EventAllRes> getEvents(
@@ -48,11 +48,11 @@ public class EventController {
             @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
             @RequestParam(name = "limit", required = false, defaultValue = "30") Integer limit){
         Page<EventRes> resPage = eventService.getEventsByPageFiltered(name, status, page, limit);
-        Application application = applicationRepo.findByCreatorUser_IdAndStatus(id, ApplicationStatus.DRAFT)
+        Application application = applicationRepo.findByCreatorUser_UsernameAndStatus(username, ApplicationStatus.DRAFT)
                 .orElse(new Application());
         EventAllRes res = new EventAllRes();
         res.setEvents(resPage);
-        res.setApplicationId(application.getId());
+        res.setApplicationId(application.getId() != null ? application.getId() : 0);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(res);
@@ -109,9 +109,9 @@ public class EventController {
 
     @PostMapping("/application/{id}/event/{eId}")
     public ResponseEntity<ApplicationRes> addEventToApplication(
-            @PathVariable(value = "id") @Min(value = 1, message = "Id не может быть меньше 1") Integer id,
+            @PathVariable(value = "id") Integer id,
             @PathVariable(value = "eId") @Min(value = 1, message = "Id не может быть меньше 1") Integer eId){
-        ApplicationRes res = applicationService.addEvent(id, eId);
+        ApplicationRes res = applicationService.addEvent(id, eId, username);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(res);
@@ -119,7 +119,7 @@ public class EventController {
 
     @DeleteMapping("/application/{id}/event/{eId}")
     public ResponseEntity<ApplicationRes> deleteEventFromApplication(
-            @PathVariable(value = "id") @Min(value = 1, message = "Id не может быть меньше 1") Integer id,
+            @PathVariable(value = "id") Integer id,
             @PathVariable(value = "eId") @Min(value = 1, message = "Id не может быть меньше 1") Integer eId){
         ApplicationRes res = applicationService.deleteEvent(id, eId);
         return ResponseEntity

@@ -1,11 +1,8 @@
 package com.example.rip.models.dtos.response;
 
 import com.example.rip.models.entities.Application;
-import com.example.rip.models.entities.User;
 import com.example.rip.models.enums.ApplicationStatus;
-import jakarta.persistence.Basic;
 import lombok.*;
-import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,8 +17,7 @@ import java.util.stream.Collectors;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ApplicationRes {
-
+public class ApplicationAllRes {
     private Integer id;
 
     private LocalDateTime createTime;
@@ -40,16 +36,11 @@ public class ApplicationRes {
 
     private ApplicationStatus status;
 
-    private List<EventRes> events;
-
-    public static ApplicationRes mapFromEntity(Application application){
-        ApplicationRes res = new ApplicationRes();
-        res.setEvents(application.getEvents().stream()
-                .map(EventRes::mapFromEntity)
-                .collect(Collectors.toList()));
+    public static ApplicationAllRes mapFromEntity(Application application){
+        ApplicationAllRes res = new ApplicationAllRes();
+        res.setId(application.getId());
         res.setCreatorUsername(application.getCreatorUser() != null ? application.getCreatorUser().getUsername() : null);
         res.setModeratorUsername(application.getModeratorUser() != null ? application.getModeratorUser().getUsername() : null);
-        res.setId(application.getId());
         res.setCreateTime(application.getCreateTime());
         res.setStatus(application.getStatus());
         res.setEndTime(application.getEndTime());

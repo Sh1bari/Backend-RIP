@@ -1,6 +1,7 @@
 package com.example.rip.controllers;
 
 import com.example.rip.models.dtos.request.ApplicationVote;
+import com.example.rip.models.dtos.response.ApplicationAllRes;
 import com.example.rip.models.dtos.response.ApplicationRes;
 import com.example.rip.models.entities.Application;
 import com.example.rip.models.enums.ApplicationStatus;
@@ -39,10 +40,10 @@ public class ApplicationController {
     }
 
     @GetMapping("/applications")
-    public ResponseEntity<List<ApplicationRes>> getApplications(
+    public ResponseEntity<List<ApplicationAllRes>> getApplications(
             @RequestParam(value = "status", required = false, defaultValue = "FORMED")ApplicationStatus status,
             @RequestParam(value = "dateFrom", required = false, defaultValue = "2010-12-04T09:21:02.258000")LocalDateTime dateFrom){
-        List<ApplicationRes> res = applicationService.getAllApplications(status, dateFrom);
+        List<ApplicationAllRes> res = applicationService.getAllApplications(status, dateFrom);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(res);

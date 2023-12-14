@@ -10,6 +10,6 @@ import lombok.*;
  */
 public class ApplicationNotFormedException extends GlobalAppException {
     public ApplicationNotFormedException() {
-        super(409, "Заявка должна быть в состоянии FORMED");
+        super(409, "Заявка должна быть в состоянии FORMED или DRAFT");
     }
 }
