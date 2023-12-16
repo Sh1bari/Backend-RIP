@@ -36,15 +36,37 @@ public class ApplicationService {
     private final EventRepo eventRepo;
     private final UserRepo userRepo;
 
-    public ApplicationRes getApplicationById(Integer id){
+    public ApplicationRes getApplicationById(Integer id, String username){
         Application application = applicationRepo.findById(id)
                 .orElseThrow(()->new ApplicationNotFoundException(id));
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(()->new UserNotFoundException(username));
+        if(!isAdmin(user) || !application.getCreatorUser().getId().equals(user.getId())){
+            throw new PermissionDeniedException();
+        }
         ApplicationRes res = ApplicationRes.mapFromEntity(application);
         return res;
     }
 
-    public List<ApplicationAllRes> getAllApplications(ApplicationStatus status, LocalDateTime dateFrom){
-        List<Application> applications = applicationRepo.findAllByStatusAndFormationTimeAfter(status, dateFrom);
+    private boolean isAdmin(User user){
+        return user.getRoles().stream().anyMatch(o->o.getName().equals("ROLE_ADMIN"));
+    }
+
+    public List<ApplicationAllRes> getAllApplications(LocalDateTime dateFrom){
+        List<Application> applications = applicationRepo.findAllByFormationTimeAfter(dateFrom).stream()
+                .filter(o->(!o.getStatus().equals(ApplicationStatus.DELETED) && !o.getStatus().equals(ApplicationStatus.FORMED)))
+                .toList();
+        List<ApplicationAllRes> res = applications.stream()
+                .map(ApplicationAllRes::mapFromEntity)
+                .toList();
+        return res;
+    }
+    public List<ApplicationAllRes> getAllApplicationsByUser(String username, LocalDateTime dateFrom){
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(()->new UserNotFoundException(username));
+        List<Application> applications = applicationRepo.findAllByCreatorUser_IdAndFormationTimeAfter(user.getId(), dateFrom).stream()
+                .filter(o->(!o.getStatus().equals(ApplicationStatus.DELETED) && !o.getStatus().equals(ApplicationStatus.FORMED)))
+                .toList();
         List<ApplicationAllRes> res = applications.stream()
                 .map(ApplicationAllRes::mapFromEntity)
                 .toList();
@@ -52,9 +74,14 @@ public class ApplicationService {
     }
 
     @Transactional
-    public ApplicationRes formApplication(Integer id){
+    public ApplicationRes formApplication(String username, Integer id){
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(()->new UserNotFoundException(username));
         Application application = applicationRepo.findById(id)
                 .orElseThrow(()->new ApplicationNotFoundException(id));
+        if(!application.getCreatorUser().getId().equals(user.getId())){
+            throw new PermissionDeniedException();
+        }
         if(!application.getStatus().equals(ApplicationStatus.DRAFT)){
             throw new ApplicationNotInDraftException();
         }
@@ -84,9 +111,14 @@ public class ApplicationService {
         }else throw new ApplicationNotValidVoteException();
     }
 
-    public Application deleteApplication(Integer id){
+    public Application deleteApplication(String username, Integer id){
         Application application = applicationRepo.findById(id)
                 .orElseThrow(()->new ApplicationNotFoundException(id));
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(()->new UserNotFoundException(username));
+        if(!application.getCreatorUser().getId().equals(user.getId())){
+            throw new PermissionDeniedException();
+        }
         if(!application.getStatus().equals(ApplicationStatus.FORMED) && !application.getStatus().equals(ApplicationStatus.DRAFT)){
             throw new ApplicationNotFormedException();
         }
@@ -104,6 +136,9 @@ public class ApplicationService {
         if(id != 0) {
             application = applicationRepo.findById(id)
                     .orElseThrow(() -> new ApplicationNotFoundException(id));
+            if(!application.getCreatorUser().getId().equals(user.getId())){
+                throw new PermissionDeniedException();
+            }
         }else{
             if(applicationRepo.findByCreatorUser_UsernameAndStatus(username, ApplicationStatus.DRAFT).isPresent()){
                 throw new ApplicationDraftPresentsException();
@@ -126,9 +161,16 @@ public class ApplicationService {
         eventRepo.save(event);
         return ApplicationRes.mapFromEntity(application);
     }
-    public ApplicationRes deleteEvent(Integer id, Integer eId){
+    public ApplicationRes deleteEvent(Integer id, Integer eId, String username){
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(()-> new UserNotFoundException(username));
         Application application = applicationRepo.findById(id)
                 .orElseThrow(()->new ApplicationNotFoundException(id));
+
+        if(!application.getCreatorUser().getId().equals(user.getId())){
+            throw new PermissionDeniedException();
+        }
+
         Event event = eventRepo.findById(eId)
                 .orElseThrow(()->new EventNotFoundException(eId));
         if(!application.getStatus().equals(ApplicationStatus.DRAFT)){
