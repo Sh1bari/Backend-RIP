@@ -47,7 +47,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                     jwtTokenUtils.getRoles(jwt).stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList())
             );
             if(redisService.getFromRedis(username).equals("IN")) {
-                log.warn("Пользователь вышел, блокировка запроса");
                 SecurityContextHolder.getContext().setAuthentication(token);
             }
         }

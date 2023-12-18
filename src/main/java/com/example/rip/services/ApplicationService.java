@@ -41,7 +41,7 @@ public class ApplicationService {
                 .orElseThrow(()->new ApplicationNotFoundException(id));
         User user = userRepo.findByUsername(username)
                 .orElseThrow(()->new UserNotFoundException(username));
-        if(!isAdmin(user) || !application.getCreatorUser().getId().equals(user.getId())){
+        if(!isAdmin(user) && !application.getCreatorUser().getId().equals(user.getId())){
             throw new PermissionDeniedException();
         }
         ApplicationRes res = ApplicationRes.mapFromEntity(application);
@@ -132,7 +132,7 @@ public class ApplicationService {
                 .orElseThrow(()-> new UserNotFoundException(username));
         Application application;
         Event event = eventRepo.findById(eId)
-                .orElseThrow(()->new EventNotFoundException(id));
+                .orElseThrow(()->new EventNotFoundException(eId));
         if(id != 0) {
             application = applicationRepo.findById(id)
                     .orElseThrow(() -> new ApplicationNotFoundException(id));
