@@ -92,8 +92,16 @@ public class EventController {
     })
     @GetMapping("/event/{id}")
     public ResponseEntity<EventRes> getEventById(
-            @PathVariable(value = "id") @Min(value = 1, message = "Id не может быть меньше 1") Integer id){
+            @PathVariable(value = "id") @Min(value = 1, message = "Id не может быть меньше 1") Integer id,
+            Principal principal){
         EventRes res = eventService.getEventById(id);
+        if(principal != null) {
+            Application application = applicationRepo.findByCreatorUser_UsernameAndStatus(principal.getName(), ApplicationStatus.DRAFT)
+                    .orElse(new Application());
+            res.setApplicationId(application.getId() != null ? application.getId() : 0);
+        }else {
+            res.setApplicationId(null);
+        }
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(res);

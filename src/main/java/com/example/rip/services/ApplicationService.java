@@ -44,6 +44,9 @@ public class ApplicationService {
         if(!isAdmin(user) && !application.getCreatorUser().getId().equals(user.getId())){
             throw new PermissionDeniedException();
         }
+        if(application.getStatus().equals(ApplicationStatus.DELETED)){
+            throw new PermissionDeniedException();
+        }
         ApplicationRes res = ApplicationRes.mapFromEntity(application);
         return res;
     }
@@ -65,7 +68,7 @@ public class ApplicationService {
         User user = userRepo.findByUsername(username)
                 .orElseThrow(()->new UserNotFoundException(username));
         List<Application> applications = applicationRepo.findAllByCreatorUser_IdAndFormationTimeAfter(user.getId(), dateFrom).stream()
-                .filter(o->(!o.getStatus().equals(ApplicationStatus.DELETED) && !o.getStatus().equals(ApplicationStatus.FORMED)))
+                .filter(o->(!o.getStatus().equals(ApplicationStatus.DELETED)))
                 .toList();
         List<ApplicationAllRes> res = applications.stream()
                 .map(ApplicationAllRes::mapFromEntity)

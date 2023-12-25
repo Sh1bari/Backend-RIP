@@ -28,6 +28,7 @@ public class EventRes {
     private String imageFilePath;
     private Integer tickets;
     private Integer purchasedTickets;
+    private Integer applicationId;
 
     public static EventRes mapFromEntity(Event event){
 

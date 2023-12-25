@@ -37,7 +37,7 @@ public class SecurityAuthService {
         UserDetails userDetails = userService.loadUserByUsername(authRequest.getUsername());
         String token = jwtTokenUtils.generateToken(userDetails);
         redisService.saveToRedis(userDetails.getUsername(), "IN");
-        return ResponseEntity.ok(new JwtResponse(token));
+        return ResponseEntity.ok(new JwtResponse(token, userDetails.getUsername()));
     }
 
     public ResponseEntity<?> createNewUser(@RequestBody RegistrationUserDto registrationUserDto) {
@@ -57,6 +57,6 @@ public class SecurityAuthService {
     public ResponseEntity<?> resetToken(String username) {
         UserDetails userDetails = userService.loadUserByUsername(username);
         String token = jwtTokenUtils.generateToken(userDetails);
-        return ResponseEntity.ok(new JwtResponse(token));
+        return ResponseEntity.ok(new JwtResponse(token, username));
     }
 }
