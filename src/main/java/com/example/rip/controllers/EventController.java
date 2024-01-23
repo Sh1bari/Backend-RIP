@@ -33,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
 import java.security.Principal;
+import java.time.LocalDateTime;
 
 /**
  * Description:
@@ -64,7 +65,7 @@ public class EventController {
             @RequestParam(name = "eventStatus", required = false, defaultValue = "ACTIVE") EventState status,
             @RequestParam(name = "eventName", required = false, defaultValue = "") String name,
             @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
-            @RequestParam(name = "limit", required = false, defaultValue = "30") Integer limit,
+            @RequestParam(name = "limit", required = false, defaultValue = "20") Integer limit,
             Principal principal){
         Page<EventRes> resPage = eventService.getEventsByPageFiltered(name, status, page, limit);
         EventAllRes res = new EventAllRes();
@@ -124,6 +125,12 @@ public class EventController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(res);
+    }
+    @PostMapping("/init")
+    public void addEvents(){
+        for(int i = 0; i < 30000; i++){
+            eventService.addEvent(new EventCreateReq("event" + i, "", 1, LocalDateTime.now().plusHours(5)));
+        }
     }
 
     @Operation(summary = "Добавить мероприятие")

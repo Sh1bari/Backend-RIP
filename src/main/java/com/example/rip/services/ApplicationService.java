@@ -55,19 +55,24 @@ public class ApplicationService {
         return user.getRoles().stream().anyMatch(o->o.getName().equals("ROLE_ADMIN"));
     }
 
-    public List<ApplicationAllRes> getAllApplications(LocalDateTime dateFrom){
-        List<Application> applications = applicationRepo.findAllByFormationTimeAfter(dateFrom).stream()
-                .filter(o->(!o.getStatus().equals(ApplicationStatus.DELETED) && !o.getStatus().equals(ApplicationStatus.FORMED)))
+    public List<ApplicationAllRes> getAllApplications(LocalDateTime dateFrom, LocalDateTime dateTo, ApplicationStatus status){
+        List<Application> applications = applicationRepo.findAllByFormationTimeAfterAndFormationTimeBefore(dateFrom, dateTo).stream()
+                .filter(o->(!o.getStatus().equals(ApplicationStatus.DELETED) && !o.getStatus().equals(ApplicationStatus.DRAFT)))
                 .toList();
+        if(status != null){
+            applications = applications.stream()
+                    .filter(o->o.getStatus().equals(status))
+                    .toList();
+        }
         List<ApplicationAllRes> res = applications.stream()
                 .map(ApplicationAllRes::mapFromEntity)
                 .toList();
         return res;
     }
-    public List<ApplicationAllRes> getAllApplicationsByUser(String username, LocalDateTime dateFrom){
+    public List<ApplicationAllRes> getAllApplicationsByUser(String username, LocalDateTime dateFrom, LocalDateTime dateTo, ApplicationStatus status){
         User user = userRepo.findByUsername(username)
                 .orElseThrow(()->new UserNotFoundException(username));
-        List<Application> applications = applicationRepo.findAllByCreatorUser_IdAndFormationTimeAfter(user.getId(), dateFrom).stream()
+        List<Application> applications = applicationRepo.findAllByCreatorUser_IdAndFormationTimeAfterAndFormationTimeBefore(user.getId(), dateFrom, dateTo).stream()
                 .filter(o->(!o.getStatus().equals(ApplicationStatus.DELETED)))
                 .toList();
         List<ApplicationAllRes> res = applications.stream()

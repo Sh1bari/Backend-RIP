@@ -21,10 +21,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Validated
 public class EventCreateReq {
-    @NotBlank(message = "Имя не может быть пустым")
+    @NotNull(message = "Имя не может быть пустым")
     private String name;
 
-    @NotBlank(message = "Описание не может быть пустым")
+    @NotNull(message = "Описание не может быть пустым")
     private String description;
 
     @Min(value = 1, message = "Билетов не может быть меньше 1")

@@ -32,7 +32,7 @@ public class EventRes {
 
     public static EventRes mapFromEntity(Event event){
 
-        String pattern = "d MMMM HH:mm";
+        String pattern = "d MMMM HH:mm yyyy";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern, new Locale("ru"));
         String formattedDateTime = event.getEventTime().format(formatter);
 

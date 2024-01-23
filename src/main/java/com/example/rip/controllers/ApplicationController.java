@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Min;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -74,13 +75,17 @@ public class ApplicationController {
     @Secured("ROLE_USER")
     @GetMapping("/applications")
     public ResponseEntity<List<ApplicationAllRes>> getApplications(
-            @RequestParam(value = "dateFrom", required = false, defaultValue = "2010-12-04T09:21:02.258000")LocalDateTime dateFrom,
+            @RequestParam(value = "dateFrom", required = false, defaultValue = "2010-12-04T09:21:02.258000")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)LocalDateTime dateFrom,
+            @RequestParam(value = "dateTo", required = false, defaultValue = "2100-12-04T09:21:02.258000")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)LocalDateTime dateTo,
+            @RequestParam(value = "status", required = false)ApplicationStatus status,
             Principal principal){
         List<ApplicationAllRes> res;
         if(userRepo.findByUsername(principal.getName()).get().getRoles().stream().anyMatch(o->o.getName().equals("ROLE_ADMIN"))){
-            res = applicationService.getAllApplications(dateFrom);
+            res = applicationService.getAllApplications(dateFrom, dateTo, status);
         }else {
-            res = applicationService.getAllApplicationsByUser(principal.getName(), dateFrom);
+            res = applicationService.getAllApplicationsByUser(principal.getName(), dateFrom, dateTo, status);
         }
         return ResponseEntity
                 .status(HttpStatus.OK)

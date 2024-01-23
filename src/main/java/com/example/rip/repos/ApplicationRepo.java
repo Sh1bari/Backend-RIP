@@ -15,7 +15,7 @@ import java.util.Optional;
  * @author Vladimir Krasnov
  */
 public interface ApplicationRepo extends CrudRepository<Application, Integer> {
-    List<Application> findAllByFormationTimeAfter(LocalDateTime dateFrom);
-    List<Application> findAllByCreatorUser_IdAndFormationTimeAfter(Integer id, LocalDateTime dateFrom);
+    List<Application> findAllByFormationTimeAfterAndFormationTimeBefore(LocalDateTime dateFrom, LocalDateTime dateTo);
+    List<Application> findAllByCreatorUser_IdAndFormationTimeAfterAndFormationTimeBefore(Integer id, LocalDateTime dateFrom, LocalDateTime dateTo);
     Optional<Application> findByCreatorUser_UsernameAndStatus(String username, ApplicationStatus status);
 }
